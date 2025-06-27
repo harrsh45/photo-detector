@@ -1,6 +1,8 @@
 
 import axios from 'axios';
 import crypto from 'crypto';
+import fs from 'fs';
+import FormData from 'form-data';
 
 /**
  * Detects if an image is AI-generated using Sightengine API
@@ -247,132 +249,253 @@ export const analyzeImageWithDeepAI = async (imageUrl) => {
 };
 
 /**
- * Analyzes video content using Cloudinary's Google Automatic Video Tagging
+ * Analyzes video content using Clarifai's General Model
  * @param {string} videoUrl - URL of the video to analyze
  * @returns {Promise<Object>} - Analysis results including tags and other metadata
  */
 export const analyzeVideoContent = async (videoUrl) => {
-    console.log('=== ANALYZE VIDEO CONTENT (CLOUDINARY) START ===');
+    console.log('=== ANALYZE VIDEO CONTENT (CLARIFAI) START ===');
     console.log('Video URL received:', videoUrl);
-    console.log('Cloudinary credentials:', 
-        process.env.CLOUDINARY_CLOUD_NAME ? 'Cloud Name Set' : 'Cloud Name Not set',
-        process.env.CLOUDINARY_API_KEY ? 'API Key Set' : 'API Key Not set',
-        process.env.CLOUDINARY_API_SECRET ? 'API Secret Set' : 'API Secret Not set');
+    console.log('Clarifai API Key:', process.env.CLARIFAI_API_KEY ? 'Set' : 'Not set');
     
     try {
-        // Extract the public ID from the Cloudinary URL if it's a Cloudinary URL
-        // Otherwise, we'll need to upload the video first (not implemented here)
-        let publicId = '';
-        
-        if (videoUrl.includes('cloudinary.com')) {
-            // Extract public ID from Cloudinary URL
-            const urlParts = videoUrl.split('/');
-            const fileNameWithExtension = urlParts[urlParts.length - 1];
-            publicId = fileNameWithExtension.split('.')[0]; // Remove extension
-            console.log('Extracted public ID from URL:', publicId);
-        } else {
-            console.log('Not a Cloudinary URL, would need to upload first');
-            // For simplicity, we'll return placeholder data
-            return {
-                tags: ['video', 'content', 'placeholder'],
-                objects: [],
-                safeSearch: {},
-                rawResponse: {}
-            };
-        }
-        
-        console.log('Making API request to Cloudinary for video tagging...');
-        
-        // Construct the Cloudinary API URL for resource details
-        // This will include the Google Video Tagging information if it was applied
-        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-        const apiKey = process.env.CLOUDINARY_API_KEY;
-        const apiSecret = process.env.CLOUDINARY_API_SECRET;
-        
-        const timestamp = Math.floor(Date.now() / 1000);
-        
-        const signature = crypto
-            .createHash('sha1')
-            .update(`public_id=${publicId}&timestamp=${timestamp}${apiSecret}`)
-            .digest('hex');
-        
-        const response = await axios.get(
-            `https://api.cloudinary.com/v1_1/${cloudName}/resources/video/upload/${publicId}`,
-            {
-                params: {
-                    timestamp,
-                    api_key: apiKey,
-                    signature
-                }
-            }
-        );
-        
-        console.log('Cloudinary API response received');
-        console.log('Response status:', response.status);
-        
-        // Check if Google Video Tagging data exists
-        let tags = [];
-        let objects = [];
-        
-        if (response.data && response.data.tags) {
-            tags = response.data.tags;
-            console.log('Tags found in response:', tags);
-        }
-        
-        // Check for detailed Google Video Tagging data in the info field
-        if (response.data && response.data.info && 
-            response.data.info.categorization && 
-            response.data.info.categorization.google_video_tagging) {
-            
-            const taggingData = response.data.info.categorization.google_video_tagging;
-            
-            if (taggingData.status === 'complete' && taggingData.data) {
-                // Extract high-confidence objects
-                objects = taggingData.data
-                    .filter(item => item.confidence > 0.8) // Only high confidence items
-                    .map(item => ({
-                        name: item.tag,
-                        categories: item.categories || [],
-                        confidence: item.confidence,
-                        timeframe: {
-                            start: item.start_time_offset,
-                            end: item.end_time_offset
-                        }
-                    }));
-                
-                // Add any tags not already included
-                const additionalTags = taggingData.data
-                    .filter(item => item.confidence > 0.6) // Lower threshold for tags
-                    .map(item => item.tag);
-                
-                // Combine and deduplicate tags
-                tags = [...new Set([...tags, ...additionalTags])];
-            }
-        }
-        
-        const result = {
-            tags,
-            objects,
-            safeSearch: {}, // Cloudinary has separate moderation if needed
-            rawResponse: response.data
+        // Initialize default result in case of errors
+        let result = {
+            tags: ['video', 'content'],
+            objects: [],
+            isAIGenerated: false,
+            safeSearch: {},
+            rawResponse: {},
+            pendingAnalysis: false
         };
         
-        console.log('Analysis result:', JSON.stringify(result, null, 2));
-        console.log('=== ANALYZE VIDEO CONTENT (CLOUDINARY) END ===');
-        return result;
-    } catch (apiError) {
-        console.error('Error calling Cloudinary API:', apiError.message);
-        console.error('API error response:', apiError.response?.data);
-        console.error('API error status:', apiError.response?.status);
-        console.log('Falling back to placeholder values due to API error');
+        console.log('Making API request to Clarifai for video analysis...');
+        
+        try {
+            // Call Clarifai's Video API with the general-image-recognition model
+            // Note: Clarifai uses the same model for both image and video analysis
+            const response = await axios.post(
+                'https://api.clarifai.com/v2/models/general-image-recognition/outputs',
+                {
+                    "user_app_id": {
+                        "user_id": "clarifai",
+                        "app_id": "main"
+                    },
+                    "inputs": [
+                        {
+                            "data": {
+                                "video": {
+                                    "url": videoUrl
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    headers: {
+                        'Authorization': `Key ${process.env.CLARIFAI_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            console.log('Clarifai API response received successfully');
+            console.log('Response status:', response.status);
+            
+            // Process the response data
+            if (response.data && response.data.outputs && response.data.outputs.length > 0) {
+                const output = response.data.outputs[0];
+                
+                // Check if the status is successful
+                if (output.status && output.status.code === 10000) { // 10000 is success code for Clarifai
+                    // Extract frames data if available
+                    if (output.data && output.data.frames) {
+                        const frames = output.data.frames;
+                        console.log(`Received data for ${frames.length} video frames`);
+                        
+                        // Process all concepts from all frames
+                        let allConcepts = [];
+                        frames.forEach(frame => {
+                            if (frame.data && frame.data.concepts) {
+                                allConcepts = [...allConcepts, ...frame.data.concepts];
+                            }
+                        });
+                        
+                        // Aggregate concepts and calculate average confidence per concept
+                        const conceptMap = new Map();
+                        allConcepts.forEach(concept => {
+                            if (!conceptMap.has(concept.name)) {
+                                conceptMap.set(concept.name, {
+                                    name: concept.name,
+                                    id: concept.id,
+                                    confidenceSum: concept.value,
+                                    count: 1
+                                });
+                            } else {
+                                const existing = conceptMap.get(concept.name);
+                                existing.confidenceSum += concept.value;
+                                existing.count += 1;
+                            }
+                        });
+                        
+                        // Convert to array and calculate average confidence
+                        const aggregatedConcepts = Array.from(conceptMap.values()).map(item => ({
+                            name: item.name,
+                            id: item.id,
+                            confidence: item.confidenceSum / item.count
+                        }));
+                        
+                        // Sort by confidence (highest first)
+                        aggregatedConcepts.sort((a, b) => b.confidence - a.confidence);
+                        
+                        // Extract tags (all concepts with confidence > 0.5)
+                        const tags = aggregatedConcepts
+                            .filter(concept => concept.confidence > 0.5)
+                            .map(concept => concept.name);
+                        
+                        // Extract high-confidence objects (confidence > 0.8)
+                        const objects = aggregatedConcepts
+                            .filter(concept => concept.confidence > 0.8)
+                            .map(concept => ({
+                                name: concept.name,
+                                confidence: concept.confidence,
+                                id: concept.id
+                            }));
+                        
+                        // Check for AI-generated content indicators in tags
+                        const aiIndicators = ['animation', 'computer graphics', 'cgi', 'digital art', 'artificial', 'synthetic', 'cartoon'];
+                        const foundAiIndicators = aiIndicators.filter(indicator => 
+                            tags.some(tag => tag.toLowerCase().includes(indicator.toLowerCase()))
+                        );
+                        
+                        const isAIGenerated = foundAiIndicators.length > 0;
+                        if (isAIGenerated) {
+                            console.log('AI-generated content indicators found:', foundAiIndicators);
+                        }
+                        
+                        // Update result with processed data
+                        result = {
+                            tags,
+                            objects,
+                            isAIGenerated,
+                            safeSearch: {}, // Clarifai has separate moderation models if needed
+                            rawResponse: response.data,
+                            pendingAnalysis: false
+                        };
+                    } else {
+                        console.log('No frames data found in the response');
+                    }
+                } else {
+                    console.warn('Clarifai API returned non-success status:', output.status);
+                }
+            } else {
+                console.warn('Unexpected API response format, missing outputs');
+            }
+            
+            console.log('Analysis result:', JSON.stringify(result, null, 2));
+            console.log('=== ANALYZE VIDEO CONTENT (CLARIFAI) END ===');
+            return result;
+            
+        } catch (apiError) {
+            console.error('Error calling Clarifai API:', apiError.message);
+            if (apiError.response) {
+                console.error('API error response data:', apiError.response.data);
+                console.error('API error response status:', apiError.response.status);
+            }
+            console.error('Using default result values');
+            
+            // Return default result in case of API error
+            return result;
+        }
+        
+    } catch (error) {
+        console.error('=== ERROR IN ANALYZE VIDEO CONTENT ===');
+        console.error('Error:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        console.error('=== END ERROR IN ANALYZE VIDEO CONTENT ===');
+        console.log('Falling back to placeholder values due to error');
         
         // Return placeholder data in case of error
         return {
             tags: ['video', 'content', 'error'],
             objects: [],
+            isAIGenerated: false,
             safeSearch: {},
             rawResponse: {},
-            error: apiError.message
+            error: error.message
+        };
+    }
+};
+
+/**
+ * Checks the status of video analysis for a given video ID
+ * This is a placeholder function as Clarifai doesn't require polling
+ * @param {string} videoId - Identifier for the video
+ * @returns {Promise<Object>} - Status and results
+ */
+export const checkVideoAnalysisStatus = async (videoId) => {
+    console.log('=== CHECK VIDEO ANALYSIS STATUS START ===');
+    console.log('Checking analysis status for video ID:', videoId);
+    
+    // With Clarifai, analysis is synchronous, so we don't need to poll
+    // This function is kept for API compatibility with the previous implementation
+    
+    return {
+        status: 'complete', // Always complete since Clarifai returns results immediately
+        result: {
+            tags: [],
+            objects: [],
+            isAIGenerated: false
+        }
+    };
+};
+
+/**
+ * Updates media with the latest video analysis results
+ * @param {string} mediaId - Database ID of the media document
+ * @param {string} videoUrl - URL of the video
+ * @returns {Promise<Object>} - Updated media document
+ */
+export const updateVideoAnalysis = async (mediaId, videoUrl) => {
+    console.log('=== UPDATE VIDEO ANALYSIS START ===');
+    console.log('Updating analysis for media ID:', mediaId);
+    
+    try {
+        // Analyze the video directly with Clarifai
+        const analysisResult = await analyzeVideoContent(videoUrl);
+        
+        // Import Media model dynamically to avoid circular dependencies
+        const Media = (await import('../model/media.model.js')).default;
+        
+        // Find and update the media document with new analysis results
+        const updatedMedia = await Media.findByIdAndUpdate(
+            mediaId,
+            {
+                tags: analysisResult.tags,
+                isAIGenerated: analysisResult.isAIGenerated,
+                // Add any other fields you want to update
+            },
+            { new: true } // Return the updated document
+        );
+        
+        console.log('Media updated successfully with new analysis results');
+        console.log('=== UPDATE VIDEO ANALYSIS END ===');
+        
+        return { 
+            updated: true, 
+            status: 'complete',
+            media: updatedMedia 
+        };
+        
+    } catch (error) {
+        console.error('Error updating video analysis:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        return { 
+            updated: false, 
+            status: 'error',
+            error: error.message 
         };
     }
 };

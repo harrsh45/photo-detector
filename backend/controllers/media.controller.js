@@ -1,5 +1,6 @@
 import { validationResult } from 'express-validator';
 import * as mediaService from '../services/media.services.js';
+import { updateVideoAnalysis } from '../services/ai.services.js';
 
 /**
  * Controller for uploading media
@@ -81,9 +82,12 @@ export const uploadMediaController = async (req, res) => {
         });
 
         console.log('Media created successfully:', JSON.stringify(media, null, 2));
+        
+        // With Clarifai, video analysis is synchronous, so we don't need to indicate pending analysis
         res.status(201).json({
             success: true,
-            data: media
+            data: media,
+            analysisComplete: true // Always true with Clarifai's synchronous analysis
         });
         console.log('=== UPLOAD MEDIA CONTROLLER END ===');
 
@@ -271,5 +275,80 @@ export const searchMediaByTagsController = async (req, res) => {
             message: 'Server error',
             error: error.message
         });
+    }
+};
+
+/**
+ * Controller for checking video analysis status
+ * With Clarifai, analysis is synchronous, but we keep this endpoint for API compatibility
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+export const checkVideoAnalysisStatus = async (req, res) => {
+    try {
+        console.log('=== CHECK VIDEO ANALYSIS STATUS CONTROLLER START ===');
+        const mediaId = req.params.mediaId;
+        console.log('Media ID:', mediaId);
+
+        // Get the media document
+        const media = await mediaService.getMediaById(mediaId);
+        
+        if (!media) {
+            console.log('Media not found');
+            return res.status(404).json({
+                success: false,
+                message: 'Media not found'
+            });
+        }
+
+        // Check if the media belongs to the user
+        if (media.userId.toString() !== req.user.id) {
+            console.log('User not authorized to access this media');
+            return res.status(403).json({
+                success: false,
+                message: 'Not authorized to access this media'
+            });
+        }
+
+        // Check if it's a video
+        if (media.type !== 'video') {
+            console.log('Media is not a video');
+            return res.status(400).json({
+                success: false,
+                message: 'Media is not a video'
+            });
+        }
+
+        console.log('Media found:', media);
+        
+        // With Clarifai, analysis is synchronous, so we don't need to poll
+        // But we'll keep this endpoint for API compatibility
+        // We can trigger a re-analysis if needed
+        const result = await updateVideoAnalysis(mediaId, media.fileUrl);
+        
+        console.log('Analysis result:', result);
+        console.log('=== CHECK VIDEO ANALYSIS STATUS CONTROLLER END ===');
+        
+        return res.status(200).json({
+            success: true,
+            status: 'complete', // Always complete with Clarifai
+            data: {
+                tags: media.tags,
+                isAIGenerated: media.isAIGenerated
+            }
+        });
+        
+    } catch (error) {
+        console.error('=== ERROR IN CHECK VIDEO ANALYSIS STATUS CONTROLLER ===');
+        console.error('Error:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+        
+        console.error('=== CHECK VIDEO ANALYSIS STATUS CONTROLLER ERROR END ===');
     }
 };

@@ -74,7 +74,7 @@ const MediaUploader = ({ onUploadSuccess }) => {
 
   return (
     <section className="mb-12 bg-gray-800 rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Upload Media</h2>
+      <h2 className="text-xl font-semibold mb-4">Image & Video Uploader</h2>
       <form onSubmit={handleUpload} className="space-y-4">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">

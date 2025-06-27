@@ -8,7 +8,8 @@ import {
     getMediaByIdController,
     deleteMediaController,
     getMediaByAIStatusController,
-    searchMediaByTagsController
+    searchMediaByTagsController,
+    checkVideoAnalysisStatus
 } from '../controllers/media.controller.js';
 
 const router = express.Router();
@@ -75,6 +76,17 @@ router.get(
         query('tags').notEmpty().withMessage('Tags are required for search')
     ],
     searchMediaByTagsController
+);
+
+// Route for checking video analysis status
+// GET /media/:mediaId/analysis-status
+router.get(
+    '/:mediaId/analysis-status',
+    authenticate,
+    [
+        param('mediaId').isMongoId().withMessage('Invalid media ID')
+    ],
+    checkVideoAnalysisStatus
 );
 
 export default router;

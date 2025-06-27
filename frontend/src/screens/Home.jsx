@@ -5,6 +5,7 @@ import { UserContext } from '../context/user.context'
 
 // Import components
 import MediaUploader from '../components/MediaUploader'
+import VideoUploader from '../components/VideoUploader'
 import MediaGallery from '../components/MediaGallery'
 import MediaDetailModal from '../components/MediaDetailModal'
 import AnalysisResultModal from '../components/AnalysisResultModal'
@@ -15,6 +16,7 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState('all')
   const [searchTags, setSearchTags] = useState('')
   const [error, setError] = useState('')
+  const [uploaderType, setUploaderType] = useState('standard') // 'standard' or 'clarifai'
   
   // Modal states
   const [selectedMedia, setSelectedMedia] = useState(null)
@@ -189,8 +191,30 @@ const Home = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Media Uploader Section */}
+        <div className="mb-6 bg-gray-800 rounded-lg p-4 shadow-lg">
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setUploaderType('standard')}
+              className={`px-4 py-2 rounded-md transition ${uploaderType === 'standard' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+            >
+              Image & Video Uploader
+            </button>
+            <button
+              onClick={() => setUploaderType('clarifai')}
+              className={`px-4 py-2 rounded-md transition ${uploaderType === 'clarifai' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+            >
+              Advanced Video Analysis
+            </button>
+          </div>
+        </div>
+
         {/* Media Uploader Component */}
-        <MediaUploader onUploadSuccess={handleUploadComplete} />
+        {uploaderType === 'standard' ? (
+          <MediaUploader onUploadSuccess={handleUploadComplete} />
+        ) : (
+          <VideoUploader />
+        )}
 
         {/* Media Gallery Component */}
         <MediaGallery 
