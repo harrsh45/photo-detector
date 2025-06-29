@@ -54,7 +54,7 @@ const Login = () => {
 
     const handleGoogleLogin = () => {
         // Redirect to the Google OAuth endpoint
-        window.open("http://localhost:3000/api/auth/google", "_self")
+        window.open("https://photo-detector-backend.onrender.com/api/auth/google", "_self")
     }
 
     return (
