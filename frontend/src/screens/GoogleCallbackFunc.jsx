@@ -30,7 +30,7 @@ const GoogleCallbackFunc = () => {
 
         // Store token in localStorage
         localStorage.setItem('token', token);
-
+        console.log("Token from Google login:", token);
         // Get user data
         const response = await axios.get('/users/me', {
           headers: {

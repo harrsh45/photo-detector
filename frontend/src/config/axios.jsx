@@ -6,16 +6,17 @@ const axiosInstance = axios.create({
 
 // Add a request interceptor to dynamically set the Authorization header
 axiosInstance.interceptors.request.use(
-    config => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
+  config => {
+    const token = localStorage.getItem('token');
+    console.log("🔐 Axios Interceptor Token:", token); // <-- ADD THIS
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
+    return config;
+  },
+  error => Promise.reject(error)
 );
 
 export default axiosInstance;

@@ -13,7 +13,10 @@ import './config/passport.js' // Import passport config
 connect()
 const app = express()
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://photo-detector-frontend.onrender.com'],
+  credentials: true
+}));
 app.use(express.urlencoded({extended: true}))
 app.use(express.static("public"))
 app.use(cookieParser())

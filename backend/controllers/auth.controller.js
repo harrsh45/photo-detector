@@ -17,7 +17,7 @@ export const googleAuthCallbackController = (req, res, next) => {
     try {
       // Generate JWT token
       const token = await user.generateJWT();
-
+      console.log(token)
       // Redirect to frontend with token
       return res.redirect(`${process.env.FRONTEND_URL}/auth/google/callback?token=${token}`);
     } catch (error) {
