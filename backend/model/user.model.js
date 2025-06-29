@@ -11,9 +11,19 @@ const userSchema = new mongoose.Schema({
         maxLength:[50,"Username must be less than 50 charachters long"]
 
     },
+    email: {
+        type: String,
+        unique: true,
+        sparse: true, // Allows null values and ensures uniqueness for non-null values
+    },
     password:{
         type:String,
         select:false,
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true, // Allows null values and ensures uniqueness for non-null values
     }
 })
 

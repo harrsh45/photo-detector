@@ -81,3 +81,19 @@ export const logoutController = async (req, res) => {
         res.status(400).send(err.message);
     }
 }
+
+export const getCurrentUserController = async (req, res) => {
+    try {
+        // User is already attached to req by the auth middleware
+        const user = await userModel.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        res.status(200).json(user);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
