@@ -1,10 +1,10 @@
 import React from 'react'
 import {Routes,Route,BrowserRouter} from 'react-router-dom'
-import Login from '../screens/Login'
-import Register from '../screens/Register'
-import Home from '../screens/Home'
-import GoogleCallback from '../screens/GoogleCallbackFunc'
-import UserAuth from '../auth/UserAuth'
+import Login from '../screens/Login.jsx'
+import Register from '../screens/Register.jsx'
+import Home from '../screens/Home.jsx'
+import GoogleCallback from '../screens/GoogleCallbackFunc.jsx'
+import UserAuth from '../auth/UserAuth.jsx'
 const AppRoutes = () => {
   return (
     <BrowserRouter>
