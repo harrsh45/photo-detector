@@ -53,13 +53,13 @@ const GoogleCallbackFunc = () => {
   }, [location, navigate, setUser]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-10 rounded-lg shadow-xl w-96 text-center">
-        <h1 className="text-white text-2xl font-bold mb-5">Processing Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-base">
+      <div className="bg-surface border border-border rounded-[10px] p-12 w-96 text-center">
+        <h1 className="text-text-primary text-2xl font-semibold mb-6 tracking-tight">Processing Login</h1>
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-surface-elevated border-t-accent"></div>
         </div>
-        <p className="text-gray-300 mt-4">Please wait while we complete your Google login...</p>
+        <p className="text-text-secondary text-sm mt-6">Please wait while we complete your Google login...</p>
       </div>
     </div>
   );

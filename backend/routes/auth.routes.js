@@ -1,10 +1,10 @@
-import express from 'express';
-import { googleAuthController, googleAuthCallbackController } from '../controllers/auth.controller.js';
+// import express from 'express';
+// import { googleAuthController, googleAuthCallbackController } from '../controllers/auth.controller.js';
 
-const router = express.Router();
+// const router = express.Router();
 
-// Google OAuth routes
-router.get('/google', googleAuthController);
-router.get('/google/callback', googleAuthCallbackController);
+// // Google OAuth routes
+// router.get('/google', googleAuthController);
+// router.get('/google/callback', googleAuthCallbackController);
 
-export default router;
+// export default router;

@@ -131,14 +131,14 @@ const VideoUploader = () => {
   };
 
   return (
-    <section className="mb-12 bg-gray-800 rounded-lg p-6 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Advanced Video Analysis</h2>
+    <section className="mb-14 bg-surface border border-border rounded-[10px] p-8">
+      <h2 className="text-lg font-semibold mb-6 tracking-tight">Advanced Video Analysis</h2>
       
       {!uploadedVideo ? (
-        <form onSubmit={handleUpload} className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-6">
+        <form onSubmit={handleUpload} className="space-y-5">
+          <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1">
-              <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition">
+              <div className="border border-dashed border-border-hover rounded-[10px] p-5 text-center cursor-pointer hover:border-accent/40 transition">
                 <input 
                   type="file" 
                   accept="video/*" 
@@ -148,102 +148,102 @@ const VideoUploader = () => {
                 />
                 <label htmlFor="video-upload" className="cursor-pointer block w-full h-full">
                   {filePreview ? (
-                    <video src={filePreview} controls className="max-h-64 mx-auto rounded"></video>
+                    <video src={filePreview} controls className="max-h-64 mx-auto rounded-[8px]"></video>
                   ) : (
-                    <div className="py-12">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                    <div className="py-14">
+                      <svg className="mx-auto h-10 w-10 text-text-tertiary" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <p className="mt-2">Drag and drop a video here, or click to select</p>
-                      <p className="text-sm text-gray-500 mt-1">Supports all video formats</p>
+                      <p className="mt-3 text-sm text-text-secondary">Drag and drop a video here, or click to select</p>
+                      <p className="text-xs text-text-tertiary mt-1.5">Supports all video formats</p>
                     </div>
                   )}
                 </label>
               </div>
               {uploadProgress > 0 && uploadProgress < 100 && (
-                <div className="mt-2">
-                  <div className="h-2 bg-gray-700 rounded-full">
+                <div className="mt-3">
+                  <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-blue-500 rounded-full" 
+                      className="h-full bg-accent rounded-full transition-all duration-300" 
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
-                  <p className="text-sm text-center mt-1">{uploadProgress}% uploaded</p>
+                  <p className="text-xs text-text-secondary text-center mt-2">{uploadProgress}% uploaded</p>
                 </div>
               )}
-              {error && <p className="text-red-500 mt-2">{error}</p>}
+              {error && <p className="text-danger text-sm mt-3">{error}</p>}
             </div>
             
-            <div className="md:w-1/3 space-y-4">
+            <div className="md:w-1/3 space-y-5">
               <button 
                 type="submit" 
-                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-md transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50"
+                className="w-full py-3 px-5 bg-accent hover:bg-accent-hover text-base font-medium rounded-[8px] transition focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={!file || isUploading}
               >
                 {isUploading ? 'Uploading...' : 'Upload & Analyze Video'}
               </button>
               
-              <div className="text-sm text-gray-400 mt-2">
-                <p>Your video will be analyzed using advanced AI to detect:</p>
-                <ul className="list-disc list-inside mt-1">
-                  <li>If it's AI-generated</li>
-                  <li>Content tags and categories</li>
-                  <li>Detailed object recognition</li>
+              <div className="text-xs text-text-tertiary mt-3 leading-relaxed">
+                <p className="text-text-secondary mb-1.5">Your video will be analyzed using advanced AI to detect:</p>
+                <ul className="list-none space-y-1">
+                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-text-tertiary inline-block"></span>If it's AI-generated</li>
+                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-text-tertiary inline-block"></span>Content tags and categories</li>
+                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-text-tertiary inline-block"></span>Detailed object recognition</li>
                 </ul>
               </div>
             </div>
           </div>
         </form>
       ) : (
-        <div className="space-y-6">
-          <div className="flex flex-col md:flex-row gap-6">
+        <div className="space-y-8">
+          <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1">
               <video 
                 src={uploadedVideo.fileUrl} 
                 controls 
-                className="w-full rounded-lg shadow-lg"
+                className="w-full rounded-[10px] border border-border"
               ></video>
             </div>
             
             <div className="md:w-1/3 space-y-4">
-              <div className="bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-medium mb-2">Analysis Status</h3>
+              <div className="bg-surface-elevated border border-border p-5 rounded-[10px]">
+                <h3 className="font-medium text-sm text-text-secondary uppercase tracking-widest mb-3">Analysis Status</h3>
                 {analysisStatus === 'pending' ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                    <span>Analyzing video...</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-surface-hover border-t-accent"></div>
+                    <span className="text-sm text-text-secondary">Analyzing video...</span>
                   </div>
                 ) : analysisStatus === 'complete' ? (
-                  <div className="text-green-500">Analysis complete</div>
+                  <div className="text-success text-sm font-medium">Analysis complete</div>
                 ) : (
-                  <div className="text-yellow-500">Waiting to start analysis</div>
+                  <div className="text-warning text-sm">Waiting to start analysis</div>
                 )}
               </div>
               
               {analysisStatus === 'complete' && (
                 <>
-                  <div className="bg-gray-700 p-4 rounded-lg">
-                    <h3 className="font-medium mb-2">AI Detection</h3>
-                    <div className={isAIGenerated ? "text-red-500" : "text-green-500"}>
+                  <div className="bg-surface-elevated border border-border p-5 rounded-[10px]">
+                    <h3 className="font-medium text-sm text-text-secondary uppercase tracking-widest mb-3">AI Detection</h3>
+                    <div className={`text-sm font-medium ${isAIGenerated ? "text-danger" : "text-success"}`}>
                       {isAIGenerated ? "AI-generated content detected" : "No AI-generated content detected"}
                     </div>
                   </div>
                   
-                  <div className="bg-gray-700 p-4 rounded-lg">
-                    <h3 className="font-medium mb-2">Content Tags</h3>
+                  <div className="bg-surface-elevated border border-border p-5 rounded-[10px]">
+                    <h3 className="font-medium text-sm text-text-secondary uppercase tracking-widest mb-3">Content Tags</h3>
                     {tags.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
                         {tags.map((tag, index) => (
                           <span 
                             key={index} 
-                            className="px-2 py-1 bg-blue-600 text-xs rounded-full"
+                            className="px-2.5 py-1 bg-accent-subtle text-accent text-xs rounded-[6px] border border-accent/10"
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-gray-400">No tags found</p>
+                      <p className="text-text-tertiary text-sm">No tags found</p>
                     )}
                   </div>
                 </>
@@ -251,7 +251,7 @@ const VideoUploader = () => {
               
               <button 
                 onClick={resetForm}
-                className="w-full py-2 px-4 bg-gray-600 hover:bg-gray-700 rounded-md transition"
+                className="w-full py-3 px-5 bg-surface-elevated border border-border text-text-secondary hover:text-text-primary hover:border-border-hover rounded-[8px] transition text-sm font-medium"
               >
                 Upload Another Video
               </button>

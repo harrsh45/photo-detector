@@ -32,41 +32,41 @@ const Register = () => {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900">
-            <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold text-white mb-6">Register</h2>
+        <div className="min-h-screen flex items-center justify-center bg-base">
+            <div className="bg-surface border border-border rounded-[10px] p-12 w-full max-w-md">
+                <h2 className="text-2xl font-semibold text-text-primary mb-8 tracking-tight">Create Account</h2>
                 <form
                     onSubmit={submitHandler}
                 >
-                    <div className="mb-4">
-                        <label className="block text-gray-400 mb-2" htmlFor="email">Username</label>
+                    <div className="mb-6">
+                        <label className="block text-text-secondary text-xs font-medium uppercase tracking-widest mb-2.5" htmlFor="email">Username</label>
                         <input
                             onChange={(e) => setUsername(e.target.value)}
                             type="text"
                             id="username"
-                            className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full py-3 px-4 bg-surface-elevated border border-border rounded-[8px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-border-focus transition"
                             placeholder="Enter your username"
                         />
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-400 mb-2" htmlFor="password">Password</label>
+                    <div className="mb-8">
+                        <label className="block text-text-secondary text-xs font-medium uppercase tracking-widest mb-2.5" htmlFor="password">Password</label>
                         <input
                             onChange={(e) => setPassword(e.target.value)} s
                             type="password"
                             id="password"
-                            className="w-full p-3 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full py-3 px-4 bg-surface-elevated border border-border rounded-[8px] text-text-primary placeholder-text-tertiary focus:outline-none focus:border-border-focus transition"
                             placeholder="Enter your password"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full p-3 rounded bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full py-3 rounded-[8px] bg-accent text-base font-medium hover:bg-accent-hover focus:outline-none transition"
                     >
                         Register
                     </button>
                 </form>
-                <p className="text-gray-400 mt-4">
-                    Already have an account? <Link to="/login" className="text-blue-500 hover:underline">Login</Link>
+                <p className="text-text-secondary text-sm mt-6">
+                    Already have an account? <Link to="/login" className="text-accent hover:text-accent-hover transition">Sign in</Link>
                 </p>
             </div>
         </div>

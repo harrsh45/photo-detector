@@ -29,6 +29,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!localStorage.getItem('token')) {
+      console.log("lajdflajfdl")
       navigate('/login')
       return
     }
@@ -170,19 +171,19 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-base text-text-primary">
       {/* Header */}
-      <header className="bg-gray-800 shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Photo Detector</h1>
-          <div className="flex items-center space-x-4">
-            <span>Welcome, {user?.username || 'User'}</span>
+      <header className="bg-surface border-b border-border">
+        <div className="container mx-auto px-6 py-5 flex justify-between items-center">
+          <h1 className="text-xl font-semibold tracking-tight">Photo Detector</h1>
+          <div className="flex items-center space-x-5">
+            <span className="text-sm text-text-secondary">Welcome, {user?.username || 'User'}</span>
             <button 
               onClick={() => {
                 localStorage.removeItem('token')
                 navigate('/login')
               }}
-              className="px-3 py-1 bg-red-600 rounded hover:bg-red-700 transition"
+              className="px-4 py-2 text-sm bg-surface-elevated border border-border text-text-secondary hover:text-danger hover:border-danger/30 rounded-[8px] transition"
             >
               Logout
             </button>
@@ -190,19 +191,19 @@ const Home = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-6 py-10">
         {/* Media Uploader Section */}
-        <div className="mb-6 bg-gray-800 rounded-lg p-4 shadow-lg">
-          <div className="flex space-x-4">
+        <div className="mb-8 bg-surface border border-border rounded-[10px] p-5">
+          <div className="flex space-x-3">
             <button
               onClick={() => setUploaderType('standard')}
-              className={`px-4 py-2 rounded-md transition ${uploaderType === 'standard' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+              className={`px-5 py-2.5 rounded-[8px] text-sm font-medium transition ${uploaderType === 'standard' ? 'bg-accent text-base' : 'bg-surface-elevated border border-border text-text-secondary hover:text-text-primary hover:border-border-hover'}`}
             >
               Image & Video Uploader
             </button>
             <button
               onClick={() => setUploaderType('clarifai')}
-              className={`px-4 py-2 rounded-md transition ${uploaderType === 'clarifai' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
+              className={`px-5 py-2.5 rounded-[8px] text-sm font-medium transition ${uploaderType === 'clarifai' ? 'bg-accent text-base' : 'bg-surface-elevated border border-border text-text-secondary hover:text-text-primary hover:border-border-hover'}`}
             >
               Advanced Video Analysis
             </button>
@@ -246,9 +247,9 @@ const Home = () => {
         />
       )}
 
-      <footer className="bg-gray-800 py-6 mt-12">
-        <div className="container mx-auto px-4 text-center text-gray-400">
-          <p>© {new Date().getFullYear()} Photo Detector - AI-Generated Content Detection</p>
+      <footer className="bg-surface border-t border-border py-8 mt-16">
+        <div className="container mx-auto px-6 text-center text-text-tertiary text-sm">
+          <p>© {new Date().getFullYear()} Photo Detector — AI-Generated Content Detection</p>
         </div>
       </footer>
     </div>
