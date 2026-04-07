@@ -126,7 +126,7 @@ const Home = () => {
       setFilePreview(null)
       setUploadProgress(0)
       
-      // Refresh media list
+      // Refresh media lis
       fetchMedia()
     } catch (err) {
       console.error('Upload error:', err)
